@@ -37,7 +37,57 @@ router.get('', async(req,res) => {
 });
 
 
+// get post id
+router.get('/post/:id', async(req,res) => {
+    try{
 
+        let slug = req.params.id;
+
+        const data = await Post.findById({ _id: slug});
+        const locals = {
+            title: "NodeJs Blog",
+            description: "ai blog"
+        }
+
+        res.render('post', { locals, data } );
+
+    } catch(error) {
+        console.log(error.message);
+
+    }
+});
+
+
+// post searchTerm
+router.post('/search', async(req,res) => {
+    try{
+        const locals = {
+            title: "NodeJs Blog",
+            description: "ai blog"
+        }
+
+        let searchTerm = req.body.searchTerm;
+
+        const searchNoSpecialChar = searchTerm.replace(/[^a-zA-Z0-9]/g, "")
+
+        
+
+        const data = await Post.find({
+            $or: [
+                { title: { $regex: new RegExp(searchNoSpecialChar, 'i')}},
+                { body: { $regex: new RegExp(searchNoSpecialChar, 'i')}}
+            ]
+        });
+
+        res.render("search", {
+            data,
+            locals
+            });
+
+    } catch(error) {
+        console.log(error.message);
+    }
+});
 
 
 module.exports = router;

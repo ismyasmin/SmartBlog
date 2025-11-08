@@ -11,6 +11,9 @@ const PORT = process.env.PORT;
 // connect to db
 connectDB();
 
+// allows to pass data to the form
+app.use(express.urlencoded({ extended: true}));
+app.use(express.json());
 app.use(express.static('public'));
 
 // templating engine
