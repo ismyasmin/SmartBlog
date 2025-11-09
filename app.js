@@ -2,13 +2,15 @@ require('dotenv').config();
 
 const express = require('express');
 const expressLayout = require('express-ejs-layouts');
+// use HTTP verbs such as PUT or DELETE in places where client doesn't support it
+const methodOverride = require('method-override');
 const cookieParser = require('cookie-parser'); // used to store session when logging in
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 
 
 const connectDB = require('./server/config/db');
-
+const { isActiveRoute } = require ('./server/helpers/routeHelpers');
 const app = express(); // start express app
 const PORT = process.env.PORT;
 
@@ -19,6 +21,7 @@ connectDB();
 app.use(express.urlencoded({ extended: true}));
 app.use(express.json());
 app.use(cookieParser());
+app.use(methodOverride('_method'));
 
 app.use(session({
     secret: 'keyboard cat',
@@ -37,6 +40,8 @@ app.use(express.static('public'));
 app.use(expressLayout);
 app.set('layout', './layouts/main')
 app.set('view engine', 'ejs');
+
+app.locals.isActiveRoute = isActiveRoute;
 
 app.use('/', require('./server/routes/main.js'));
 app.use('/', require('./server/routes/admin.js'));

@@ -1,10 +1,10 @@
 const express = require ('express');
 const router = express.Router();
-const Post = require('../models/Post'); // use thhis model to insert and retrieve data
+const Post = require('../models/Post'); // use this model to insert and retrieve data
 
 
 // routes
-
+// get Home
 router.get('', async(req,res) => {
     try{
         const locals = {
@@ -28,7 +28,10 @@ router.get('', async(req,res) => {
             locals,
             data,
             current: page,
-            nextPage: hasNextPage ? nextPage : null} );
+            nextPage: hasNextPage ? nextPage : null,
+            currentRoute: '/'
+        });
+            
 
     } catch(error) {
         console.log(error.message);
@@ -49,7 +52,7 @@ router.get('/post/:id', async(req,res) => {
             description: "ai blog"
         }
 
-        res.render('post', { locals, data } );
+        res.render('post', { locals, dat , currentRoute: `/post/${slug}` });
 
     } catch(error) {
         console.log(error.message);
@@ -81,7 +84,8 @@ router.post('/search', async(req,res) => {
 
         res.render("search", {
             data,
-            locals
+            locals,
+            currentRoute: '/'
             });
 
     } catch(error) {
@@ -89,5 +93,12 @@ router.post('/search', async(req,res) => {
     }
 });
 
+// post About
+router.get('/about', (req, res) => {
+    res.render('about', {
+      currentRoute: '/about' //  Pass current route to EJS template
+    });
+  });
+  
 
 module.exports = router;
