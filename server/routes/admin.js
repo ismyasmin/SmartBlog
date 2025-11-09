@@ -160,7 +160,6 @@ router.get('/add-post', authMiddleware, async (req, res) => {
 });
 
 // Admin POST - Add New Post Content
-
 // Protected by authMiddleware so only logged-in users can add posts
 router.post('/add-post', authMiddleware, async (req, res) => {
     try {
@@ -190,6 +189,46 @@ router.post('/add-post', authMiddleware, async (req, res) => {
         console.log(error);
     }
 });
+
+// Admin GET - Edit Post
+router.get('/edit-post/:id', authMiddleware, async (req, res) => {
+    try {
+
+        const locals = {
+            title: 'Edit Post',
+            description: 'Edit Post Page'
+        };
+
+        const data = await Post.findOne({ _id: req.params.id});
+
+        res.render('admin/edit-post', {
+            locals,
+            data,
+            layout: adminLayout
+        })
+
+    } catch (error) {
+        console.log(error);
+    }
+});
+
+// Admin PUT - Update / Edit Post
+router.put('/edit-post/:id', authMiddleware, async (req, res) => {
+    try {
+
+        await Post.findByIdAndUpdate(req.params.id, {
+            title: req.body.title,
+            body: req.body.body,
+            updatedAt: Date.now()
+        });
+
+        res.redirect(`/edit-post/${req.params.id}`);
+
+    } catch (error) {
+        console.log(error);
+    }
+});
+
 
 
 module.exports = router;
