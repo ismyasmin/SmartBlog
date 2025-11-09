@@ -136,5 +136,28 @@ router.post('/admin', async (req, res) => {
 });
 
 
+// Admin - Create a New Post
+router.get('/add-post', authMiddleware, async (req, res) => {
+    try {
+        // Page metadata
+        const locals = {
+            title: 'Add Post',
+            description: 'Post'
+        };
+
+        // Fetch all posts from database
+        const data = await Post.find();
+
+        // Render add-post page to add new posts. Render admin layout too
+        res.render('admin/add-post', {
+            locals,
+            layout: adminLayout
+        });
+
+    } catch (error) {
+        console.log(error);
+    }
+});
+
 
 module.exports = router;
