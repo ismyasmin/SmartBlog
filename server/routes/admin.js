@@ -9,12 +9,37 @@ const adminLayout = '../views/layouts/admin';
 const jwtSecret = process.env.JWT_SECRET;
 
 
+// Check Login -  Middleware to check if user is authenticate
+const authMiddleware = (req, res, next) => {
+    const token = req.cookies.token; // Get JWT token from cookies
+
+    // If no token found, block access
+    if (!token) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    try {
+        // Verify token using the secret key
+        const decoded = jwt.verify(token, jwtSecret);
+
+        // Store user ID in request for later use
+        req.userId = decoded.userId;
+
+        // Allow request to continue to next middleware or route
+        next();
+    } catch (error) {
+        // If verification fails, deny access
+        res.status(401).json({ message: 'Unauthorized' });
+    }
+};
+
+
 // GET Admin - Login Page
 router.get('/admin', async(req,res) => {
     try{
         const locals = {
-            title: "Admin",
-            description: "ai blog"
+            title: 'Admin',
+            description: 'ai blog'
         }
 
 
@@ -63,28 +88,30 @@ router.post('/admin', async (req, res) => {
     }
 });
 
+// Protected route: Admin Dashboard
+router.get('/dashboard', authMiddleware, async (req, res) => {
+    try {
+        // Page metadata
+        const locals = {
+            title: 'Dashboard',
+            description: 'Admin dashboard'
+        };
 
+        // Fetch all posts from database
+        const data = await Post.find();
 
+        // Render dashboard page with posts data and admin layout
+        res.render('admin/dashboard', {
+            locals,
+            data,
+            layout: adminLayout
+        });
 
+    } catch (error) {
+        console.log(error);
+    }
+});
 
-
-// // POST Admin - Check Login
-// router.post('/admin', async (req, res) => {
-//     try {
-
-//         const { username, password } = req.body;
-//         if(req.body.username === 'admin' && req.body.password === 'password') {
-//             console.log(req.body);
-//             //res.redirect('/');
-//             res.send('You are logged in!');
-//         } else {
-//             res.send('Wrong user or password')
-//         }
-
-//     } catch(error){
-//         console.log(error);
-//     }
-// });
 
 // POST Admin - Register
 router.post('/admin', async (req, res) => {
