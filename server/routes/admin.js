@@ -136,7 +136,7 @@ router.post('/admin', async (req, res) => {
 });
 
 
-// Admin - Create a New Post
+// Admin GET - Create a New Post
 router.get('/add-post', authMiddleware, async (req, res) => {
     try {
         // Page metadata
@@ -155,6 +155,38 @@ router.get('/add-post', authMiddleware, async (req, res) => {
         });
 
     } catch (error) {
+        console.log(error);
+    }
+});
+
+// Admin POST - Add New Post Content
+
+// Protected by authMiddleware so only logged-in users can add posts
+router.post('/add-post', authMiddleware, async (req, res) => {
+    try {
+        // Log the request body for debugging
+        console.log(req.body);
+
+        try {
+            // Create a new Post instance using form data
+            const newPost = new Post({
+                title: req.body.title, // Post title from form input
+                body: req.body.body    // Post body from form input
+            });
+
+            // Save the new post to MongoDB
+            await Post.create(newPost);
+
+            // Redirect back to dashboard after successful creation
+            res.redirect('/dashboard');
+
+        } catch (error) {
+            // Handle database or validation errors
+            console.log(error);
+        }
+
+    } catch (error) {
+        // Catch any unexpected server errors
         console.log(error);
     }
 });
