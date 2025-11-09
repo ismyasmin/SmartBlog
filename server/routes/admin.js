@@ -3,9 +3,11 @@ const router = express.Router();
 const Post = require('../models/Post'); // use this model to insert and retrieve data
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
-
+const jwt = require('jsonwebtoken');
 
 const adminLayout = '../views/layouts/admin';
+const jwtSecret = process.env.JWT_SECRET;
+
 
 // GET Admin - Login Page
 router.get('/admin', async(req,res) => {
@@ -23,6 +25,45 @@ router.get('/admin', async(req,res) => {
 
     }
 });
+
+// POST Admin - Check Login
+router.post('/admin', async (req, res) => {
+    try {
+        // Extract username and password from request body
+        const { username, password } = req.body;
+
+        // Find user in MongoDB by username
+        const user = await User.findOne({ username });
+
+        // If user doesn't exist, return 401 (Unauthorized)
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        // Compare input password with hashed password stored in DB
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        // If password is invalid, return 401
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        // Generate a JWT token for the logged-in user
+        const token = jwt.sign({ userId: user._id }, jwtSecret);
+
+        // Store the JWT token in a secure, HTTP-only cookie
+        res.cookie('token', token, { httpOnly: true });
+
+        // Redirect user to dashboard after successful login
+        res.redirect('/dashboard');
+
+    } catch (error) {
+        // Log any unexpected errors
+        console.log(error);
+    }
+});
+
+
 
 
 
