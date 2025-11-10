@@ -248,6 +248,45 @@ router.delete('/delete-post/:id', authMiddleware, async (req,res) => {
     }
 });
 
+// POST - Publish blog to database
+router.post('/publish', authMiddleware, async (req, res) => {
+    try {
+      // Extract title and body from the request
+      const { title, body } = req.body;
+  
+      // Validate required fields before saving
+      if (!title || !body) {
+        return res.status(400).json({
+          success: false,
+          message: "Title and body are required."
+        });
+      }
+  
+      // Create a new post document using the Mongoose Post model
+      const newPost = new Post({
+        title,
+        body,
+        createdAt: new Date() // Record the creation time
+      });
+  
+      // Save the new post to MongoDB
+      await newPost.save();
+  
+      // Respond with a success message
+      res.json({
+        success: true,
+        message: "Blog published successfully!"
+      });
+  
+    } catch (error) {
+      // Log and handle any errors that occur during publishing
+      console.error("Publish error:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to publish post."
+      });
+    }
+  });
 
 
 
