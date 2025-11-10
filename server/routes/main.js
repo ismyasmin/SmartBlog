@@ -52,7 +52,7 @@ router.get('/post/:id', async(req,res) => {
             description: "ai blog"
         }
 
-        res.render('post', { locals, dat , currentRoute: `/post/${slug}` });
+        res.render('post', { locals, data , currentRoute: `/post/${slug}` });
 
     } catch(error) {
         console.log(error.message);
