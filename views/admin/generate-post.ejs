@@ -1,0 +1,80 @@
+<div class="admin-container">
+  <h1><%= locals.title %></h1>
+  <p><%= locals.description %></p>
+
+  <form id="generateForm">
+    <label for="topic">Enter a blog topic:</label>
+    <input type="text" id="topic" name="topic" placeholder="e.g. Benefits of learning JavaScript" required>
+
+    <button type="button" id="generateBtn">Generate with AI <|°ᴗ°|></button>
+
+    <textarea id="content" name="body" rows="15" placeholder="AI generated blog will appear here..."></textarea>
+
+    <a href="/dashboard" button type="submit" id="publishBtn">Publish˚⟡˖ ࣪</button></a>
+  </form>
+
+  <div id="loading" style="display:none;">ೱ Generating your blog, please wait...</div>
+</div>
+
+<script>
+  const generateBtn = document.getElementById('generateBtn');
+  const publishBtn = document.getElementById('publishBtn');
+  const textarea = document.getElementById('content');
+  const topicInput = document.getElementById('topic');
+  const loadingDiv = document.getElementById('loading');
+
+  generateBtn.addEventListener('click', async () => {
+    const topic = topicInput.value.trim();
+    if (!topic) return alert("Please enter a topic!");
+
+    loadingDiv.style.display = "block";
+    generateBtn.disabled = true;
+    textarea.value = "";
+
+    try {
+      const res = await fetch("/admin/generate-post", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ topic })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        textarea.value = data.post;
+      } else {
+        alert("AI failed to generate. Try again!");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong.");
+    } finally {
+      loadingDiv.style.display = "none";
+      generateBtn.disabled = false;
+    }
+  });
+
+  // Optional: handle "Publish"
+  document.getElementById('generateForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const topic = topicInput.value.trim();
+    const body = textarea.value.trim();
+
+    if (!topic || !body) return alert("Please enter a topic and generate content first!");
+
+    try {
+      const res = await fetch("/admin/publish", { // your normal publish route
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: topic, body })
+      });
+
+      const result = await res.json();
+      if (result.success) alert("✅ Blog published!");
+      else alert("❌ Publish failed");
+    } catch (error) {
+      console.error(error);
+    }
+  });
+</script>
+

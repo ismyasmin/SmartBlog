@@ -4,9 +4,17 @@ const Post = require('../models/Post'); // use this model to insert and retrieve
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const openAI = require('openai');
+
 
 const adminLayout = '../views/layouts/admin';
 const jwtSecret = process.env.JWT_SECRET;
+
+const openai = new openAI({
+    apiKey: process.env.OPENAI_API_KEY
+});
+
+console.log("✅ admin.js routes file loaded");  // Add at the top
 
 
 // Check Login -  Middleware to check if user is authenticate
@@ -240,11 +248,102 @@ router.delete('/delete-post/:id', authMiddleware, async (req,res) => {
     }
 });
 
+
+
+
+// GET - Generate Blog Post Page
+router.get('/generate-post', authMiddleware, async (req,res) =>{
+
+    try {
+        const locals = {
+            title: 'Generate blog',
+            description: 'Generate blog with ai'
+        };
+
+        res.render('admin/generate-post', {
+            locals,
+            layout: adminLayout
+        });
+
+    } catch(error) {
+        console.log(error);
+    }
+   
+});
+
+// POST - Generate Blog Post
+// router.post('/generate-post', authMiddleware, async (req,res) => {
+//     console.log("✅ /generate-post route hit");   // Add inside route
+
+//     try {
+//         const { topic } = req.body;
+
+//         const prompt =  `Write a high-quality blog post about "${topic}".
+//         Include:
+//         - A catchy title
+//         - An engaging introduction
+//         - 3–4 informative sections
+//         - A short conclusion
+//         Make it SEO-friendly and easy to read.`;
+
+//         const completion = await openai.chat.completions.create({
+//             model: "gpt-3.5-turbo",
+//             messages: [{ role: "user", content: prompt }]
+//         });
+
+//         const aiPost = completion.choices[0].message.content;
+
+//         // const newPost = new Post({
+//         //     title: topic,
+//         //     body: aiPost,
+//         //     createdAt: new Date()
+//         //   });
+          
+//           await newPost.save();
+
+//           res.json({ success: true, post: newPost });
+
+//     } catch(error) {
+//         console.log(error);
+//         res.status(500).json({ success: false, message: "AI generation failed." });
+//     }
+// });
+router.post('/generate-post', authMiddleware, async (req, res) => {
+    try {
+      const { topic } = req.body; // Extract the blog topic from the request body
+  
+      // Construct a prompt for the AI to generate a structured blog post
+      const prompt = `Write a high-quality blog post about "${topic}".
+        Include:
+        - A catchy title
+        - Engaging introduction
+        - 3–4 informative sections
+        - A short conclusion.`;
+  
+      // Call OpenAI API to generate blog content
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o-mini", // Lightweight, faster OpenAI model for text generation
+        messages: [{ role: "user", content: prompt }]
+      });
+  
+      // Extract the AI-generated post text from the response
+      const aiPost = completion.choices[0].message.content;
+  
+      // Return the generated post as JSON to the client (front-end)
+      res.json({ success: true, post: aiPost });
+  
+    } catch (error) {
+      console.error('AI generation error:', error);
+      res.status(500).json({ success: false, message: "AI generation failed." });
+    }
+  });
+
+
 // Admin GET - Logout
 router.get('/logout', (req,res) => {
     res.clearCookie('token');
     // res.json( {message: 'Logged out!'});
     res.redirect('/');
-}) 
+});
 
 module.exports = router;

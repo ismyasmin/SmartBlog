@@ -11,6 +11,7 @@ const MongoStore = require('connect-mongo');
 
 const connectDB = require('./server/config/db');
 const { isActiveRoute } = require ('./server/helpers/routeHelpers');
+const aiRoutes = require('./server/routes/admin');
 const app = express(); // start express app
 const PORT = process.env.PORT;
 
@@ -22,6 +23,7 @@ app.use(express.urlencoded({ extended: true}));
 app.use(express.json());
 app.use(cookieParser());
 app.use(methodOverride('_method'));
+app.use('/admin', aiRoutes);
 
 app.use(session({
     secret: 'keyboard cat',
@@ -32,6 +34,7 @@ app.use(session({
     }),
     // cookie: { maxAge: new Date ( Date.now() + (3600000) ) }
 }));
+
 
 
 app.use(express.static('public'));
