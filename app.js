@@ -80,6 +80,10 @@ app.set('layout', './layouts/main')
 app.set('view engine', 'ejs');
 
 app.locals.isActiveRoute = isActiveRoute;
+app.use((req, res, next) => {
+    res.locals.currentRoute = req.path; // makes current URL path available in all EJS files
+    next();
+  });
 
 app.use('/', require('./server/routes/main.js'));
 app.use('/', require('./server/routes/admin.js'));
