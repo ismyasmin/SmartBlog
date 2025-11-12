@@ -14,7 +14,7 @@
     font-family: 'Poppins', sans-serif;
     color: var(--black);
     font-size: var(--font-size-base);
-    background-color:#EF87BE;
+    background-color: #FAD1E8;
     background-image: url("/img/img-noise-361x370.png");
     margin: 0;
   }
@@ -151,11 +151,54 @@
     flex-direction: column; /* Stack nav links vertically */
     gap: 10px; /* Reduce spacing for smaller screens */
   }
+}
 
-  .header_button {
-    justify-content: center; /* Center the search button */
-    margin-top: 10px; /* Add spacing between elements */
-  }
+.header_button {
+  display: flex;                   /* Align items horizontally */
+  align-items: center;             /* Vertically center items */
+  gap: 12px;                       /* Add space between buttons/links */
+  background-color: #f8f9fa;       /* Light gray background */
+  padding: 8px 16px;               /* Inner spacing */
+  border-radius: 12px;             /* Rounded corners for soft look */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle drop shadow */
+}
+
+
+
+.searchBtn {
+  background-color: #d7e6f6;       /* Primary blue color */
+  color: white;                    /* White text for contrast */
+  border: none;                    /* Remove default button border */
+  border-radius: 8px;              /* Rounded edges */
+  padding: 8px 14px;               /* Comfortable clickable size */
+  cursor: pointer;                 /* Show pointer on hover */
+  font-size: 0.95rem;              /* Slightly smaller than normal text */
+  font-weight: 500;                /* Medium weight text */
+  transition: all 0.3s ease;       /* Smooth hover animation */
+}
+
+/* Hover effect for search button */
+.searchBtn:hover {
+  background-color: #d7e6f6;       /* Darker blue on hover */
+  transform: translateY(-2px);     /* Slight lift effect */
+}
+
+
+/* auth link for Login/Register, Dashboard/Logout*/
+.auth-link {
+  text-decoration: none;           /* Remove underline */
+  color: #333;                     /* Neutral dark gray text */
+  font-weight: 500;                /* Slightly bold text */
+  padding: 8px 14px;               /* Space around link for better click area */
+  border-radius: 8px;              /* Rounded corners */
+  transition: all 0.3s ease;       /* Smooth hover transitions */
+}
+
+/* Hover effect for auth links */
+.auth-link:hover {
+  background-color: #d7e6f6;       /* Blue background on hover */
+  color: white;                    /* White text for contrast */
+  transform: translateY(-2px);     /* Slight lift animation */
 }
 
   
@@ -312,6 +355,8 @@
     color: var(--gray-light);
     padding: 15px;
   }
+  
+
   
   
   .pagination {
