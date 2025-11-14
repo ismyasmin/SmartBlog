@@ -1,6 +1,7 @@
 const express = require ('express');
 const router = express.Router();
-const Post = require('../models/Post'); // use this model to insert and retrieve data
+const Post = require('../models/Post'); // Model to insert and retrieve Post data
+const Contact = require('../models/Contact'); // model for contact form
 
 
 // routes
@@ -93,18 +94,75 @@ router.post('/search', async(req,res) => {
     }
 });
 
-// post About
+// get About
 router.get('/about', (req, res) => {
+
+    const locals = {
+        title: "About",
+        description: "About page"
+    } 
     res.render('about', {
       currentRoute: '/about' //  Pass current route to EJS template
     });
   });
 
-router.get('/contact', (req,res) => {
+// POST - contact
+router.post('/contact', async(req,res) => {
+    try {
+      const locals = {
+        title: "Contact",
+        description: "Contact page"
+      };
+  
+      const { name, email, message } = req.body;
+  
+      // Basic validation
+      if (!name || !email || !message) {
+        return res.render('contact', { 
+          locals,
+          currentRoute: '/contact',
+          success: null, 
+          error: 'All fields are required.' 
+        });
+      }
+  
+      // Save to MongoDB
+      await Contact.create({ name, email, message });
+  
+      // Log it 
+      console.log("CONTACT FORM:", { name, email, message });
+  
+      // Success response. Pass current route to EJS template
+      return res.render('contact', { 
+        locals,
+        currentRoute: '/contact',
+        success: 'Message sent successfully! We will get back to you soon.',
+        error: null 
+      });
+  
+    } catch (error) {
+      console.log(error);
+  
+      return res.render('contact', { 
+        currentRoute: '/contact',
+        success: null,
+        error: 'Something went wrong, please try again.'
+      });
+    }
+  });
+  
+// get - contact
+router.get('/contact', (req, res) => {
     res.render('contact', { 
-    currentRoute: '/contact' //  Pass current route to EJS template
+        success: null,
+        error: null 
     });
-})
+});
+
+
+    
+
+
   
 
 module.exports = router;

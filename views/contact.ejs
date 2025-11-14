@@ -22,10 +22,20 @@
   
       <button type="submit" class="btn">Send Message</button>
     </form>
+
+    
+    <% // If the backend passed a "success" message, show it
+    if (success) { %>
+      <p class="success-msg"><%= success %></p>
+    <% } %>
+
+    <% // If the backend passed an "error" message, show it
+    if (error) { %>
+      <p class="error-msg"><%= error %></p>
+    <% } %>
   
     <div class="contact-info">
       <h2>Other Ways to Reach Me</h2>
-      <p>Email: <a href="SmartBlog@gmail.com">SmartBlog@gmail.com</a></p>
       <p>GitHub: <a href="https://github.com/ismyasmin" target="_blank">github.com/ismyasmin</a></p>
     </div>
   </section>
