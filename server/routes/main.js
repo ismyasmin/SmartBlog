@@ -99,6 +99,12 @@ router.get('/about', (req, res) => {
       currentRoute: '/about' //  Pass current route to EJS template
     });
   });
+
+router.get('/contact', (req,res) => {
+    res.render('contact', { 
+    currentRoute: '/contact' //  Pass current route to EJS template
+    });
+})
   
 
 module.exports = router;
