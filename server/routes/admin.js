@@ -8,6 +8,9 @@ const openAI = require('openai');
 
 
 const adminLayout = '../views/layouts/admin';
+const mainLayout = '../views/layouts/main';
+
+
 const jwtSecret = process.env.JWT_SECRET;
 
 const openai = new openAI({
@@ -18,11 +21,12 @@ console.log("✅ admin.js routes file loaded");  // Add at the top
 
 
 // Check Login -  Middleware to check if user is authenticate
-const authMiddleware = (req, res, next) => {
+const authMiddleware = async (req, res, next) => {
     const token = req.cookies.token; // Get JWT token from cookies
 
     // If no token found, block access
     if (!token) {
+        res.locals.user = null; // important for EJS templates
         return res.status(401).json({ message: 'Unauthorized' });
     }
 
@@ -33,25 +37,29 @@ const authMiddleware = (req, res, next) => {
         // Store user ID in request for later use
         req.userId = decoded.userId;
 
+        const user = await User.findById(req.userId).select('-password');
+        res.locals.user = user || null;
+
         // Allow request to continue to next middleware or route
         next();
     } catch (error) {
         // If verification fails, deny access
+        res.locals.user = null;
         res.status(401).json({ message: 'Unauthorized' });
     }
 };
 
 
 // GET Admin - Login Page
-router.get('/admin', async(req,res) => {
+router.get('/admin/login', async(req,res) => {
     try{
         const locals = {
-            title: 'Admin',
+            title: 'Login',
             description: 'ai blog'
         }
 
 
-        res.render('admin/login', { locals, layout: adminLayout} );
+        res.render('admin/login', { locals, layout: mainLayout} );
 
     } catch(error) {
         console.log(error.message);
@@ -59,8 +67,27 @@ router.get('/admin', async(req,res) => {
     }
 });
 
+
+// GET Admin - Login Page
+router.get('/admin/register', async(req,res) => {
+    try{
+        const locals = {
+            title: 'Register',
+            description: 'ai blog'
+        }
+
+
+        res.render('admin/register', { locals, layout: mainLayout});
+
+    } catch(error) {
+        console.log(error.message);
+
+    }
+});
+
+
 // POST Admin - Check Login
-router.post('/admin', async (req, res) => {
+router.post('/admin/login', async (req, res) => {
     try {
         // Extract username and password from request body
         const { username, password } = req.body;
@@ -122,28 +149,31 @@ router.get('/dashboard', authMiddleware, async (req, res) => {
 
 
 // POST Admin - Register
-router.post('/admin', async (req, res) => {
+router.post('/admin/register', async (req, res) => {
     try {
 
         const { username, password } = req.body;
+
+        // Check if user already exists
+        const existingUser = await User.findOne({ username });
+        if (existingUser) {
+            return res.status(400).json({ message: 'Username already exists' });
+        }
+
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        try {
-            const user = await User.create({ username, password: hashedPassword });
-            res.status(201).json({ message: 'User Created', user});
-        }catch(error) {
-            if(error.code === 11000) {
-                res.status(400).json({ message: 'User already in use'});
-            }
-            res.status(500).json( { message: 'Interal service error'});
-        }
+       
+        // Create new user
+        const user = await User.create({ username, password: hashedPassword });
+
+        res.status(201).json({ message: 'User Created', user});
+        
        
     } catch(error){
         console.log(error);
+        res.status(500).json( { message: 'Interal service error'});
     }
 });
-
-
 // Admin GET - Create a New Post
 router.get('/add-post', authMiddleware, async (req, res) => {
     try {
@@ -310,43 +340,7 @@ router.get('/generate-post', authMiddleware, async (req,res) =>{
    
 });
 
-// POST - Generate Blog Post
-// router.post('/generate-post', authMiddleware, async (req,res) => {
-//     console.log("✅ /generate-post route hit");   // Add inside route
 
-//     try {
-//         const { topic } = req.body;
-
-//         const prompt =  `Write a high-quality blog post about "${topic}".
-//         Include:
-//         - A catchy title
-//         - An engaging introduction
-//         - 3–4 informative sections
-//         - A short conclusion
-//         Make it SEO-friendly and easy to read.`;
-
-//         const completion = await openai.chat.completions.create({
-//             model: "gpt-3.5-turbo",
-//             messages: [{ role: "user", content: prompt }]
-//         });
-
-//         const aiPost = completion.choices[0].message.content;
-
-//         // const newPost = new Post({
-//         //     title: topic,
-//         //     body: aiPost,
-//         //     createdAt: new Date()
-//         //   });
-          
-//           await newPost.save();
-
-//           res.json({ success: true, post: newPost });
-
-//     } catch(error) {
-//         console.log(error);
-//         res.status(500).json({ success: false, message: "AI generation failed." });
-//     }
-// });
 router.post('/generate-post', authMiddleware, async (req, res) => {
     try {
       const { topic } = req.body; // Extract the blog topic from the request body
