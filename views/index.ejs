@@ -19,10 +19,22 @@
       <% }) %>
     </ul>
 
-    <% if (nextPage !== null) { %>
-        <a href="/?page=<%= nextPage %>" class="pagination">&lt; View Older Posts</a>
-      <% } %>
-     
+
+    <div class="pagination-wrapper">
+      <div class="pagination-left">
+      <% if (nextPage !== null) { %>
+        <!-- Older posts -->
+          <a href="/?page=<%= nextPage %>" class="pagination">&lt; View Older Posts</a>
+        <% } %>
+       </div>
+
+
+    <div class="pagination-right">
+    <% if (previousPage !== null) { %>
+      <!-- Newer posts -->
+      <a href="/?page=<%= previousPage %>" class="pagination">View Newer Posts &gt;</a>
+  <% } %>
+    </div>
+
     
-  
   </section>

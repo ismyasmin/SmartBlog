@@ -13,23 +13,38 @@ router.get('', async(req,res) => {
             description: "ai blog"
         }
 
-        let perPage = 5;
-        let page = req.query.page || 1; // if there's no page query, set default page query is one and get the first 10 blog plots
+        let perPage = 3;
+        const page = Math.max(1, parseInt(req.query.page) || 1);  
+        // never let page be < 1
+
+        const totalPosts = await Post.countDocuments({});
+        const totalPages = Math.ceil(totalPosts / perPage);
+
+        // clamp page if user goes too far forward
+        const safePage = Math.min(page, totalPages);
 
         const data = await Post.aggregate([ { $sort: { createdAt: -1}}]) // oldest at the top
-        .skip(perPage * page - perPage)
+        .skip(perPage * (safePage - 1))
         .limit(perPage)
-        .exec(); // execute aggregated pipeline 
+        // .exec(); // execute aggregated pipeline 
 
-        const count = await Post.countDocuments({});
-        const nextPage = parseInt(page) + 1;
-        const hasNextPage = nextPage <= Math.ceil(count / perPage);
+        // const count = await Post.countDocuments({});
+
+
+        // Newer posts - go backward in pages (page - 1)
+        const previousPage = page > 1 ? page - 1 : null;
+
+        // Older posts - go forward in pages (page + 1)
+        const nextPage = page < totalPages ? page + 1 : null;
+        // const nextPage = parseInt(page) + 1;
+        // const hasNextPage = nextPage <= Math.ceil(count / perPage);
 
         res.render('index', { 
             locals,
             data,
-            current: page,
-            nextPage: hasNextPage ? nextPage : null,
+            current: safePage,
+            nextPage,
+            previousPage,
             currentRoute: '/'
         });
             
