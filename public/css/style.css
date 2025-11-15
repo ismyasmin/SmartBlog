@@ -358,15 +358,45 @@
   
 
   
+.pagination-wrapper {
+  display: flex;
+
+  /* Space-between pushes children to far edges (left & right) */
+  justify-content: space-between;
+
+  /* Vertically center them */
+  align-items: center;
+
+  /* Space above the pagination area */
+  margin-top: 2rem;
+}
+
+.pagination-left,
+.pagination-right {
+  width: 50%;
+}
+
+/* Ensures the "Older Posts" link stays left-aligned inside the left container */
+.pagination-left .pagination {
+  float: left;
+}
+
+/* Ensures the "Newer Posts" link stays right-aligned inside the right container. */
+.pagination-right .pagination {
+  float: right;
+}
+
+.pagination {
+  padding: 10px 18px;
+  background: #93b3e0; /* light blue background */
+  color: white;        /* white text for contrast */
+  text-decoration: none; /* removes underline from links */
+  border-radius: 6px;    /* rounded button corners */
+  font-weight: 500;      /* slightly bolder text for legibility */
+}
+
+.pagination:hover {
+  background: #374151; /* lighter gray on hover */
+}
+
   
-  .pagination {
-    font-size: 1.3rem;
-    color: var(--gray);
-    text-decoration: none;
-    margin-top: 40px;
-    display: inline-block;
-  }
-  
-  .pagination:hover {
-    color: var(--black);
-  }
