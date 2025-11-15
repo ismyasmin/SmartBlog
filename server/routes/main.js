@@ -26,19 +26,13 @@ router.get('', async(req,res) => {
         const data = await Post.aggregate([ { $sort: { createdAt: -1}}]) // oldest at the top
         .skip(perPage * (safePage - 1))
         .limit(perPage)
-        // .exec(); // execute aggregated pipeline 
-
-        // const count = await Post.countDocuments({});
-
-
+       
         // Newer posts - go backward in pages (page - 1)
         const previousPage = page > 1 ? page - 1 : null;
 
         // Older posts - go forward in pages (page + 1)
         const nextPage = page < totalPages ? page + 1 : null;
-        // const nextPage = parseInt(page) + 1;
-        // const hasNextPage = nextPage <= Math.ceil(count / perPage);
-
+       
         res.render('index', { 
             locals,
             data,
