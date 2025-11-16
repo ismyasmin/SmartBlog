@@ -79,6 +79,16 @@
     overflow: hidden;
     border-radius: var(--border-radius);
   }
+
+  .git-link {
+    text-decoration: none;
+  }
+  /* Github-icon */
+.github-icon {
+  align-items: left;
+  width: 30px;
+}
+
   
   
   /* Main Header */
@@ -218,6 +228,10 @@
     font-size: var(--font-size-md);
     margin: 5px 0 40px 0;
   }
+
+  .about-reg{
+    text-decoration: none;
+  }
   
   /* Home Article List */
 .articles__heading {
@@ -290,7 +304,7 @@
   
   /* Footer */
   .footer {
-    margin: 4rem;
+    margin: 2rem;
     text-align: center;
   }
   /* Dashboard Admin */
