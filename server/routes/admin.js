@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const openAI = require('openai');
 
 
+
 const adminLayout = '../views/layouts/admin';
 const mainLayout = '../views/layouts/main';
 
@@ -133,12 +134,29 @@ router.get('/dashboard', authMiddleware, async (req, res) => {
         };
 
         // Fetch all posts from database
-        const data = await Post.find();
+
+        let perPage = 6;
+        let page = parseInt(req.query.page) || 1;
+
+        const previousPage = page > 1 ? page - 1 : null;
+        
+        const data = await Post.aggregate([{ $sort: { createdAt: -1 }}])
+            .skip((perPage * page) - perPage)
+            .limit(perPage);
+
+        const count = await Post.countDocuments({});
+        const nextPage = page + 1;
+        const hasNextPage = nextPage <= Math.ceil(count / perPage);
+
 
         // Render dashboard page with posts data and admin layout
         res.render('admin/dashboard', {
             locals,
             data,
+            current: page,
+            previousPage,
+            nextPage: hasNextPage ? nextPage : null,
+            currentRoute: '/dashboard',
             layout: adminLayout
         });
 
