@@ -1,0 +1,25 @@
+<%
+  // Determine whether the user is on home or admin dashboard
+  const baseUrl = currentRoute === '/dashboard' ? '/dashboard' : '/';
+%>
+
+<div class="pagination-wrapper">
+  <!-- Left side - Older Posts -->
+  <div class="pagination-left">
+    <% if (nextPage !== null) { %>
+      <a href="<%= baseUrl %>?page=<%= nextPage %>" class="pagination">
+        &lt; View Older Posts
+      </a>
+    <% } %>
+  </div>
+
+  <!-- Right side - Newer Posts -->
+  <div class="pagination-right">
+    <% if (previousPage !== null) { %>
+      <a href="<%= baseUrl %>?page=<%= previousPage %>" class="pagination">
+        View Newer Posts &gt;
+      </a>
+    <% } %>
+  </div>
+
+</div>
