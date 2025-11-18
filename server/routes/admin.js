@@ -368,8 +368,8 @@ router.post('/generate-post', authMiddleware, async (req, res) => {
         Include:
         - A catchy title
         - Engaging introduction
-        - 3–4 informative sections
-        - A short conclusion.`;
+        - 2 informative sections
+        - A very short conclusion.`;
   
       // Call OpenAI API to generate blog content
       const completion = await openai.chat.completions.create({
